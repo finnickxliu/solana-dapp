@@ -2,6 +2,9 @@
   "name": "solana-dapp",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "16.x"
+  },
   "dependencies": {
     "@solana/web3.js": "1.76.0",
     "react": "18.2.0",
