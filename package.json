@@ -2,13 +2,10 @@
   "name": "solana-dapp",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": "16.x"
-  },
   "dependencies": {
-    "@solana/web3.js": "1.76.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "@solana/web3.js": "^1.73.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-scripts": "4.0.3"
   },
   "scripts": {
@@ -16,5 +13,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
