@@ -36,22 +36,35 @@ export default function App() {
 
   const connectWallet = async () => {
     const { solana } = window;
-    if (solana) {
+    if (!solana || !solana.isPhantom) {
+      alert("Please install the Phantom Wallet extension.");
+      return;
+    }
+
+    try {
       const response = await solana.connect();
       setWalletAddress(response.publicKey.toString());
       getBalance(response.publicKey);
+    } catch (err) {
+      console.error("Connection failed:", err);
     }
   };
 
   const getBalance = async (publicKey) => {
     const bal = await connection.getBalance(publicKey);
-    setBalance(bal / LAMPORTS_PER_SOL);
+    setBalance((bal / LAMPORTS_PER_SOL).toFixed(4));
   };
 
   const sendSol = async () => {
     try {
+      if (!receiver || !amount || isNaN(amount)) {
+        alert("Please enter a valid receiver address and amount.");
+        return;
+      }
+
       const fromPubKey = new PublicKey(walletAddress);
       const toPubKey = new PublicKey(receiver);
+
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: fromPubKey,
@@ -61,34 +74,41 @@ export default function App() {
       );
 
       transaction.feePayer = fromPubKey;
-      transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+      transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 
       const signed = await window.solana.signTransaction(transaction);
       const signature = await connection.sendRawTransaction(signed.serialize());
 
       await connection.confirmTransaction(signature);
-      alert('Transaction successful: ' + signature);
+      alert('✅ Transaction successful!\nSignature: ' + signature);
+
       getBalance(fromPubKey);
+      setAmount('');
+      setReceiver('');
     } catch (error) {
       console.error('Transaction error:', error);
-      alert('Transaction failed');
+      alert('❌ Transaction failed. Check console.');
     }
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Solana Wallet dApp Demo</h1>
+    <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
+      <h1>🔥 Solana dApp Demo</h1>
+
       {walletAddress ? (
         <>
-          <p>Wallet: {walletAddress}</p>
-          <p>Balance: {balance} SOL</p>
-          <div>
+          <p><strong>Wallet:</strong> {walletAddress}</p>
+          <p><strong>Balance:</strong> {balance} SOL</p>
+
+          <div style={{ marginTop: '1rem' }}>
             <input
+              style={{ marginRight: '10px' }}
               placeholder="Receiver Address"
               value={receiver}
               onChange={(e) => setReceiver(e.target.value)}
             />
             <input
+              style={{ marginRight: '10px', width: '80px' }}
               placeholder="Amount"
               type="number"
               value={amount}
